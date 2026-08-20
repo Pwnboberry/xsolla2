@@ -62,7 +62,7 @@ To continue the security assessment, the official prebuilt release package publi
 ```bash
 wget https://github.com/juice-shop/juice-shop/releases/download/v17.1.1/juice-shop-17.1.1_node20_linux_x64.tgz
 ```
-![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/clone%20of%20the%20repository.png)
+![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/clone%20of%20the%20repository.jpg)
 
 ```
 tar -xzvf juice-shop-17.1.1_node20_linux_x64.tgz
