@@ -6,7 +6,7 @@
 - Node.js: v20.20.2
 - npm: 10.8.2
 
-![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/versions.png)
+![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/versions.JPG)
 
 ---
 
@@ -62,14 +62,14 @@ To continue the security assessment, the official prebuilt release package publi
 ```bash
 wget https://github.com/juice-shop/juice-shop/releases/download/v17.1.1/juice-shop-17.1.1_node20_linux_x64.tgz
 ```
-![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/clone%20of%20the%20repository.jpg)
+![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/clone%20of%20the%20repository.JPG)
 
 ```
 tar -xzvf juice-shop-17.1.1_node20_linux_x64.tgz
 cd juice-shop_17.1.1_node20_linux_x64
 npm start
 ```
-![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/launching%20npm.png)
+![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/launching%20npm.JPG)
 
 The application started successfully.
 
@@ -78,7 +78,7 @@ info: Detected Node.js version v20.20.2 (OK)
 info: Port 3000 is available (OK)
 ```
 
-![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/OWASP%20Juice%20Shop.png)
+![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/OWASP%20Juice%20Shop.JPG)
 
 ---
 
