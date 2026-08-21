@@ -12,7 +12,7 @@ No automated vulnerability scanners (Burp Suite, OWASP ZAP, Nikto) were used dur
 
 ---
 
-# 1. Broken Access Control
+## 1. Broken Access Control
 
 ## OWASP Top 10
 
