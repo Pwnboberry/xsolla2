@@ -10,6 +10,20 @@
 
 No automated vulnerability scanners (Burp Suite, OWASP ZAP, Nikto) were used during this assessment.
 
+## Executive Summary
+
+The assessment identified five distinct vulnerability classes in OWASP Juice Shop v17.1.1:
+
+| Priority | Vulnerability | Risk |
+|----------|---------------|------|
+| CRITICAL | SQL Injection | Authentication bypass, full database access |
+| HIGH | Broken Access Control | Unauthorized admin access |
+| HIGH | XSS | Session theft, phishing |
+| MEDIUM | Sensitive Data Exposure | Information leakage |
+| MEDIUM | Security Misconfiguration | Missing security headers |
+
+**Most critical:** SQL Injection — allows attacker to bypass login and gain administrative access.
+
 ---
 
 # 1. Broken Access Control
