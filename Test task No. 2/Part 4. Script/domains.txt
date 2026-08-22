@@ -1,1 +1,9 @@
-
+#Edit domains.txt to add or remove your own domain names (one per line)
+xsolla.com
+paypal.com
+fdxf.com
+phtt.ru
+google.com
+yandex.ru
+vk.com
+gosuslugi.ru
