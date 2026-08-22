@@ -1,26 +1,26 @@
-## Part 2. OWASP Juice Shop Vulnerability Assessment
+## Часть 2. Анализ уязвимостей OWASP Juice Shop
 
-### Environment
+### Окружение
 
-- Application: OWASP Juice Shop v17.1.1
+- Приложение: OWASP Juice Shop v17.1.1
 - URL: http://localhost:3000
-- Browser: Google Chrome
-- Operating System: Kali Linux
-- Analysis method: Manual testing using browser Developer Tools (DevTools)
+- Браузер: Google Chrome
+- Операционная система: Kali Linux
+- Метод анализа: ручное тестирование с использованием инструментов разработчика браузера (DevTools)
 
-No automated vulnerability scanners (Burp Suite, OWASP ZAP, Nikto) were used during this assessment.
+Во время анализа автоматические сканеры уязвимостей (Burp Suite, OWASP ZAP, Nikto) не использовались.
 
-### Executive Summary
+### Краткое резюме
 
-| Priority | Vulnerability | Risk |
-|----------|---------------|------|
-| CRITICAL | SQL Injection | Authentication bypass, full database access |
-| HIGH | Broken Access Control | Unauthorized admin access |
-| HIGH | XSS | Session theft, phishing |
-| MEDIUM | Sensitive Data Exposure | Information leakage |
-| MEDIUM | Security Misconfiguration | Missing security headers |
+| Приоритет | Уязвимость | Риск |
+|----------|------------|------|
+| КРИТИЧЕСКИЙ | SQL Injection | Обход аутентификации, полный доступ к базе данных |
+| ВЫСОКИЙ | Broken Access Control | Несанкционированный доступ к панели администратора |
+| ВЫСОКИЙ | XSS | Кража сессий, фишинг |
+| СРЕДНИЙ | Sensitive Data Exposure | Утечка конфиденциальной информации |
+| СРЕДНИЙ | Security Misconfiguration | Неправильная настройка безопасности |
 
-**Most critical:** SQL Injection — allows attacker to bypass login and gain administrative access.
+**Наиболее критичная уязвимость:** SQL Injection, позволяющая обойти механизм входа в систему и получить права администратора.
 
 ---
 
@@ -28,39 +28,39 @@ No automated vulnerability scanners (Burp Suite, OWASP ZAP, Nikto) were used dur
 
 ### OWASP Top 10
 
-**A01:2021 – Broken Access Control**
+**A01:2021 – Нарушение контроля доступа (Broken Access Control)**
 
-### Location
+### Где обнаружена
 
 ```
 http://localhost:3000/#/administration
 ```
 
-### How it was discovered
+### Как была обнаружена
 
-After logging into the application as an administrator, I manually navigated through the available pages and discovered the Administration panel.
+После входа в приложение под учётной записью администратора я вручную исследовала доступные разделы приложения и обнаружила административную панель.
 
-The page allows management of users and application content. Access to this functionality demonstrates the presence of privileged administrative features.
+Данная страница предоставляет возможность управлять пользователями и содержимым приложения, что свидетельствует о наличии привилегированных административных функций.
 
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/part2/Broken%20Access%20Control1.png)
 
-### Business Impact
+### Чем грозит бизнесу
 
-If an attacker gains administrative privileges, they can:
+Если злоумышленник получит административные привилегии, он сможет:
 
-- modify user accounts;
-- delete customer data;
-- disable parts of the application;
-- completely compromise the integrity of the service.
+- изменять учётные записи пользователей;
+- удалять пользовательские данные;
+- отключать части приложения;
+- полностью нарушить целостность сервиса.
 
-This could result in service disruption and loss of customer trust.
+Это может привести к остановке работы системы и потере доверия со стороны пользователей.
 
-### Recommendation
+### Рекомендации по устранению
 
-- Apply strict Role-Based Access Control (RBAC).
-- Verify permissions on every server-side request.
-- Restrict administrative endpoints to authorized roles only.
-- Perform authorization checks on the backend, not only in the frontend.
+- Использовать строгую модель разграничения прав доступа (RBAC).
+- Проверять права пользователя при каждом запросе на стороне сервера.
+- Ограничить доступ к административным разделам только авторизованным администраторам.
+- Выполнять проверки авторизации на сервере, а не только в интерфейсе приложения.
 
 ---
 
@@ -68,19 +68,19 @@ This could result in service disruption and loss of customer trust.
 
 ### OWASP Top 10
 
-**A02:2021 – Cryptographic Failures (Sensitive Data Exposure)**
+**A02:2021 – Cryptographic Failures (Раскрытие конфиденциальной информации)**
 
-### Location
+### Где обнаружена
 
 ```
 http://localhost:3000/ftp
 ```
 
-### How it was discovered
+### Как была обнаружена
 
-While exploring the application manually, I discovered an exposed FTP directory.
+Во время ручного исследования приложения был обнаружен открытый FTP-каталог.
 
-The directory contains internal files such as:
+В каталоге находятся внутренние файлы приложения, например:
 
 - encrypt.py
 - quarantine
@@ -90,23 +90,23 @@ The directory contains internal files such as:
 
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/part2/Sensitive%20Data%20Exposure%20(ftp)3.JPG)
 
-### Business Impact
+### Чем грозит бизнесу
 
-Public access to internal files may expose:
+Публичный доступ к внутренним файлам может привести к раскрытию:
 
-- confidential company information;
-- backup files;
-- internal documentation;
-- credentials or password databases.
+- конфиденциальной информации компании;
+- резервных копий;
+- внутренней документации;
+- файлов с учётными данными или базами паролей.
 
-Such information could be used for further attacks against the organization.
+Эта информация может использоваться злоумышленниками для подготовки дальнейших атак на инфраструктуру компании.
 
-### Recommendation
+### Рекомендации по устранению
 
-- Disable public access to internal directories.
-- Store sensitive files outside the web root.
-- Apply proper authentication and authorization.
-- Regularly review publicly accessible resources.
+- Запретить публичный доступ к внутренним каталогам.
+- Хранить конфиденциальные файлы вне директории веб-приложения.
+- Использовать механизмы аутентификации и авторизации.
+- Регулярно проверять ресурсы, доступные без авторизации.
 
 ---
 
@@ -114,46 +114,45 @@ Such information could be used for further attacks against the organization.
 
 ### OWASP Top 10
 
-**A05:2021 – Security Misconfiguration**
+**A05:2021 – Неправильная конфигурация безопасности (Security Misconfiguration)**
 
-### Location
+### Где обнаружена
 
 HTTP Response Headers
 
-### How it was discovered
+### Как была обнаружена
 
-Using the browser Developer Tools (Network tab), I inspected HTTP response headers.
+С помощью вкладки **Network** в инструментах разработчика браузера были проанализированы HTTP-заголовки ответа.
 
-Several recommended security headers were missing:
+Было обнаружено отсутствие нескольких рекомендуемых заголовков безопасности:
 
 - Content-Security-Policy
 - Strict-Transport-Security
 - Referrer-Policy
 
-Additionally, the deprecated **Feature-Policy** header was present instead of the modern **Permissions-Policy**.
+Кроме того, использовался устаревший заголовок **Feature-Policy** вместо современного **Permissions-Policy**.
 
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/part2/Security%20Misconfiguration2.JPG)
 
-### Business Impact
+### Чем грозит бизнесу
 
-Missing security headers increase the risk of:
+Отсутствие защитных HTTP-заголовков увеличивает риск:
 
 - Cross-Site Scripting (XSS);
-- Man-in-the-Middle attacks;
-- information leakage through HTTP Referer headers;
-- browser abuse of sensitive features.
+- атак типа Man-in-the-Middle;
+- утечки информации через HTTP Referer;
+- злоупотребления возможностями браузера.
 
-### Recommendation
+### Рекомендации по устранению
 
-Configure appropriate security headers:
+Настроить следующие защитные HTTP-заголовки:
 
 - Content-Security-Policy
 - Strict-Transport-Security
 - Referrer-Policy
 - Permissions-Policy
 
-### Review the server configuration according to OWASP Secure Header
----
+Также рекомендуется проверить конфигурацию веб-сервера в соответствии с рекомендациями проекта **OWASP Secure Headers**.
 
 ---
 
@@ -163,11 +162,11 @@ Configure appropriate security headers:
 
 **A03:2021 – Injection (Cross-Site Scripting)**
 
-### Location
+### Где обнаружена
 
-Search field
+Поле поиска.
 
-Payload used:
+Использованный payload:
 
 ```html
 <img src=x onerror=alert(1)>
@@ -175,33 +174,33 @@ Payload used:
 
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/part2/the%20search%20bar-xss.JPG)
 
-### How it was discovered
+### Как была обнаружена
 
-The payload was entered into the application search field.
+В поле поиска был введён XSS-payload.
 
-The application accepted the input without proper sanitization.
+Приложение приняло введённые данные без достаточной фильтрации.
 
-The payload was reflected back into the page, demonstrating that user input is processed without sufficient validation.
+Payload был отражён обратно в интерфейсе приложения, что свидетельствует о недостаточной обработке пользовательского ввода.
 
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/part2/XSS4.JPG)
 
-### Business Impact
+### Чем грозит бизнесу
 
-An attacker could:
+Злоумышленник может:
 
-- execute arbitrary JavaScript;
-- steal user session cookies;
-- impersonate users;
-- redirect visitors to malicious websites.
+- выполнить произвольный JavaScript-код;
+- украсть пользовательские сессии;
+- выдавать себя за других пользователей;
+- перенаправлять посетителей на вредоносные сайты.
 
-This may lead to account compromise and phishing attacks.
+Это может привести к компрометации пользовательских аккаунтов и успешным фишинговым атакам.
 
-### Recommendation
+### Рекомендации по устранению
 
-- Escape all user-controlled output.
-- Validate and sanitize input.
-- Use a strict Content Security Policy.
-- Prefer framework-provided output encoding.
+- Экранировать весь пользовательский вывод.
+- Валидировать и очищать пользовательский ввод.
+- Использовать строгую политику Content Security Policy.
+- Использовать встроенные механизмы безопасного вывода данных фреймворка.
 
 ---
 
@@ -211,53 +210,53 @@ This may lead to account compromise and phishing attacks.
 
 **A03:2021 – Injection (SQL Injection)**
 
-### Location
+### Где обнаружена
 
-Login page
+Страница авторизации.
 
-### How it was discovered
+### Как была обнаружена
 
-Manual testing of the authentication form revealed SQL Injection behavior.
+Во время ручного тестирования формы входа была выявлена возможность SQL-инъекции.
 
-The application accepted SQL Injection payloads during authentication.
+Приложение приняло SQL Injection payload при попытке аутентификации.
 
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/part2/sql%20inj5.png)
 
-After that, the account was automatically logged in with administrator privileges.
+После этого приложение автоматически выполнило вход под учётной записью администратора.
 
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/part2/payloadSQL.png)
 
-### Business Impact
+### Чем грозит бизнесу
 
-SQL Injection may allow an attacker to:
+SQL Injection позволяет злоумышленнику:
 
-- bypass authentication;
-- read confidential database information;
-- modify stored records;
-- delete application data;
-- gain complete control over the database.
+- обходить механизм аутентификации;
+- читать конфиденциальные данные из базы данных;
+- изменять существующие записи;
+- удалять информацию;
+- получить полный контроль над базой данных.
 
-The potential impact is critical because it affects confidentiality, integrity, and availability.
+Данная уязвимость является критической, поскольку нарушает конфиденциальность, целостность и доступность данных.
 
-### Recommendation
+### Рекомендации по устранению
 
-- Use parameterized SQL queries (Prepared Statements).
-- Never concatenate user input into SQL queries.
-- Validate user input.
-- Apply the principle of least privilege for database accounts.
+- Использовать параметризованные SQL-запросы (Prepared Statements).
+- Никогда не объединять пользовательский ввод со строкой SQL-запроса.
+- Выполнять проверку и валидацию пользовательского ввода.
+- Использовать принцип минимально необходимых привилегий для учётных записей базы данных.
 
 ---
 
-### Result
+## Итог
 
-During the assessment, five different vulnerability classes were identified:
+В ходе анализа были выявлены пять различных классов уязвимостей:
 
-| Vulnerability | OWASP Category |
-|---------------|----------------|
+| Уязвимость | Категория OWASP |
+|------------|-----------------|
 | Broken Access Control | A01:2021 |
 | Sensitive Data Exposure | A02:2021 |
 | SQL Injection | A03:2021 |
 | Cross-Site Scripting | A03:2021 |
 | Security Misconfiguration | A05:2021 |
 
-The vulnerabilities were identified manually using browser functionality and developer tools without performing attacks against any external systems.
+Все уязвимости были обнаружены вручную с использованием браузера и инструментов разработчика без выполнения атак на внешние системы.
