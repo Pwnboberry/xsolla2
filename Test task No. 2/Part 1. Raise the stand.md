@@ -1,8 +1,8 @@
-# Environment Setup
+# Развёртывание окружения
 
-## Environment
+## Окружение
 
-- Operating System: Kali Linux
+- Операционная система: Kali Linux
 - Node.js: v20.20.2
 - npm: 10.8.2
 
@@ -10,17 +10,17 @@
 
 ---
 
-## Deployment Process
+## Процесс развёртывания
 
-### Option 1 — Docker
+### Вариант 1 — Docker
 
-The first deployment attempt used the official Docker image recommended by the project documentation.
+Первая попытка развёртывания была выполнена с использованием официального Docker-образа, рекомендованного в документации проекта.
 
 ```bash
 docker run --rm -p 3000:3000 bkimminich/juice-shop:v17.1.1
 ```
 
-The deployment could not be completed because Docker was unable to download the image from Docker Hub.
+Развёртывание не удалось, так как Docker не смог загрузить образ из Docker Hub.
 
 ```text
 Unable to find image 'bkimminich/juice-shop:v17.1.1' locally
@@ -32,9 +32,9 @@ i/o timeout
 
 ---
 
-### Option 2 — Build from Source
+### Вариант 2 — Сборка из исходного кода
 
-The second attempt used the official GitHub repository.
+Вторая попытка была выполнена с использованием официального репозитория GitHub.
 
 ```bash
 git clone https://github.com/juice-shop/juice-shop.git
@@ -43,7 +43,7 @@ git checkout v17.1.1
 npm install
 ```
 
-During dependency installation, npm reported dependency resolution conflicts.
+Во время установки зависимостей npm сообщил о конфликте зависимостей.
 
 ```text
 npm ERR! code ERESOLVE
@@ -51,27 +51,29 @@ npm ERR! ERESOLVE could not resolve
 ...
 ```
 
-Several attempts were made to resolve the issue, including testing different Node.js versions and using `--legacy-peer-deps`. However, the dependency conflicts could not be resolved in the local environment.
+Для решения проблемы было предпринято несколько попыток, включая использование разных версий Node.js и установку зависимостей с параметром `--legacy-peer-deps`. Однако устранить конфликт зависимостей в локальном окружении не удалось.
 
 ---
 
-### Option 3 — Official Prebuilt Release
+### Вариант 3 — Готовая официальная сборка
 
-To continue the security assessment, the official prebuilt release package published by the OWASP Juice Shop project was used.
+Чтобы продолжить выполнение задания, была использована официальная готовая сборка (prebuilt release), опубликованная разработчиками OWASP Juice Shop.
 
 ```bash
 wget https://github.com/juice-shop/juice-shop/releases/download/v17.1.1/juice-shop-17.1.1_node20_linux_x64.tgz
 ```
+
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/clone%20of%20the%20repository.JPG)
 
-```
+```bash
 tar -xzvf juice-shop-17.1.1_node20_linux_x64.tgz
 cd juice-shop_17.1.1_node20_linux_x64
 npm start
 ```
+
 ![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/launching%20npm.JPG)
 
-The application started successfully.
+После этого приложение успешно запустилось.
 
 ```text
 info: Detected Node.js version v20.20.2 (OK)
@@ -82,13 +84,12 @@ info: Port 3000 is available (OK)
 
 ---
 
-## Difficulties Encountered
+## Возникшие сложности
 
-Two deployment methods were attempted before the application was successfully launched.
+Перед успешным запуском приложения были предприняты две попытки развёртывания.
 
-The Docker-based deployment could not be completed because the Docker daemon was unable to download the image from Docker Hub due to network connectivity issues.
+Первый вариант с использованием Docker не удалось реализовать, поскольку Docker не смог загрузить образ из Docker Hub из-за проблем с сетевым подключением.
 
-The second approach, building the application from source, resulted in dependency resolution conflicts during package installation. Several troubleshooting attempts were made, including switching Node.js versions and using alternative npm installation options, but the issue remained unresolved.
+Вторая попытка, предусматривавшая сборку приложения из исходного кода, завершилась конфликтом зависимостей при установке пакетов. Для решения проблемы были предприняты несколько попыток, включая смену версии Node.js и использование альтернативных параметров установки npm, однако устранить конфликт не удалось.
 
-To proceed with the assignment, the official prebuilt release package provided by the OWASP Juice Shop project was used. This allowed the application to run successfully while preserving the same functionality required for the security assessment.
-
+Чтобы продолжить выполнение задания, была использована официальная готовая сборка OWASP Juice Shop. Это позволило успешно запустить приложение, сохранив весь необходимый функционал для проведения анализа безопасности.
