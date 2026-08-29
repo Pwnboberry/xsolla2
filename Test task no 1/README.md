@@ -27,12 +27,13 @@ The output includes:
 ```bash
 # Install jq (Debian/Ubuntu/Kali)
 sudo apt-get update
-sudo apt-get install jq -y
+sudo apt-get install gawk jq -y
 ```
 
 Check the installation:
 
 ```bash
+gawk --version
 jq --version
 ```
 
