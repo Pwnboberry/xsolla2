@@ -1,0 +1,7 @@
+.env
+state.json
+cve_report.txt
+llm_audit.log
+venv/
+__pycache__/
+*.pyc
