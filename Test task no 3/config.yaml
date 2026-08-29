@@ -1,5 +1,4 @@
 # Stack to monitor. Matched as whole words against the CVE description
-# (case-insensitive), so "go" won't match inside "storage".
 stack:
   - nginx
   - postgresql
@@ -9,35 +8,31 @@ stack:
   - docker
   - kubernetes
  
-# How far back to look for CVEs modified in NVD (not just published --
-# re-scored CVEs matter too).
+# How far back to look for CVEs modified in NVD
 lookback_days: 2
  
-# Hard cap on individual notifications sent in a single run.
+# Hard cap on individual notifications sent in a single run
 max_notifications: 20
  
-# Below this CVSS score, don't notify at all (0 = no floor).
+# Below this CVSS score, don't notify at all (0 = no floor)
 min_cvss: 0
  
-# If more than this many CVEs qualify in one run, switch to digest mode:
-# only the top `max_full_detail_in_digest` get a full LLM-summarized
-# message, the rest go in one compact list message.
+
 digest_threshold: 8
 max_full_detail_in_digest: 5
  
-# How long a sent CVE ID is remembered for idempotency, in days.
+# How long a sent CVE ID is remembered for idempotency, in days
 state_retention_days: 90
  
-# After this many consecutive failed runs, the heartbeat is marked urgent.
+# After this many consecutive failed runs, the heartbeat is marked urgent
 consecutive_failures_alert: 3
  
-# Priority thresholds, on a 0-1 composite score (CVSS + EPSS + exploit
-# mention). A CISA-KEV hit always forces CRITICAL regardless of these.
+# Priority thresholds, on a 0-1 composite score (CVSS + EPSS + exploit mention)
 thresholds:
   critical: 0.75
   high: 0.55
   medium: 0.35
  
-# Local LLM via Ollama.
+# Local LLM via Ollama
 ollama_model: "llama3.2:1b"
 ollama_url: "http://localhost:11434/api/generate"
