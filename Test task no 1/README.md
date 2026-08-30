@@ -130,4 +130,7 @@ All three files are optional — the script processes whichever ones are present
 
 ## Example output
 
-![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/build_timeline/logs.JPG)
+![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/logsterm.JPG)
+
+
+![](https://github.com/Pwnboberry/xsolla2/blob/main/screenshots/logsgtml.JPG)
