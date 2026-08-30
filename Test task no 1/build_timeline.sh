@@ -74,9 +74,8 @@ fi
 if [ -f "edr_events.json" ] && command -v jq &> /dev/null; then
     echo "  📁 Parsing EDR logs..."
     jq -r '
-        [.timestamp, "EDR", .event, .user, .src_ip // "-", .detail // "-"] | 
-        @csv
-    ' edr_events.json >> timeline.csv || echo "⚠️  jq failed to parse edr_events.json — check its format" >&2
+    [.timestamp, "EDR", .event, .user, (.src_ip // "-"), (.detail // "-" | gsub(","; ";"))] | join(",")
+' edr_events.json >> timeline.csv || echo "⚠️  jq failed to parse edr_events.json — check its format" >&2
 fi
 
 # ---------- WEB LOGS ----------
