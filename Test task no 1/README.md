@@ -20,8 +20,9 @@ The output includes:
 
 - Linux (Kali, Ubuntu, Debian) or macOS
 - Bash 4.0+
-- `jq` — for parsing EDR JSON logs
-
+- `gawk` (GNU awk) - the script uses `match()` with a capture array, a GNU extension not available in plain POSIX awk/mawk
+- `jq` - for parsing EDR JSON logs
+- 
 ## Installing dependencies
 
 ```bash
@@ -41,8 +42,9 @@ jq --version
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/log-timeline-analyzer.git
-cd log-timeline-analyzer
+git clone https://github.com/Pwnboberry/xsolla2.git
+cd "xsolla2/Test task no 1"
+
 ```
 
 Make the script executable:
@@ -90,6 +92,41 @@ In `auth.log`, the IP address may appear in different positions. We search for t
 ## Why are all 5,000+ events not displayed in the terminal?
 
 More than 5,000 lines are difficult to read. We display only critical events (4–10 entries) in the terminal, while all other events are exported to CSV and HTML for detailed analysis.
+
+## Expected log formats
+
+Place the log files in the same directory as the script, using these
+exact names and formats:
+
+**`auth.log`** - standard Linux syslog format (as produced by rsyslog),
+one event per line, no year in the timestamp:
+```
+Dec 13 21:27:14 hostname sshd[31287]: Accepted password for deploy from 203.0.113.77 port 52288 ssh2
+```
+
+⚠️ Syslog auth.log lines don't include a year. The script assumes **2016** by default (the year of this assignment's dataset). 
+To analyze logs from a different year, set the `AUTH_LOG_YEAR` environment variable before running:
+
+```
+AUTH_LOG_YEAR=2024 ./build_timeline.sh
+```
+
+**`access.log`** - Apache/Nginx combined log format, includes its own year in the timestamp, no extra configuration needed:
+
+```
+153.107.193.211 - - [13/Dec/2016:20:00:30 -0800] "GET / HTTP/1.1" 200 10230 "-" "Mozilla/5.0 ..."
+```
+
+**`edr_events.json`** - JSON Lines (one JSON object per line, not a JSON array), with these fields expected:
+
+```
+{"timestamp": "2016-12-13T21:27:14Z", "host": "web-prod-01", "event": "logon", "user": "deploy", "src_ip": "203.0.113.77", "detail": "interactive SSH session"}
+```
+
+Required fields: `timestamp`, `event`, `user`. Optional: `src_ip`, `detail` (both default to `-` if missing).
+
+All three files are optional — the script processes whichever ones are present in the directory and skips the rest.
+
 
 ## Example output
 
