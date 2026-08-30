@@ -10,16 +10,18 @@ echo "🔍 Building timeline..."
 
 echo "timestamp,source,event_type,user,src_ip,detail" > timeline.csv
 
+AUTH_LOG_YEAR="${AUTH_LOG_YEAR:-2016}"
 # ---------- AUTH LOG ----------
 if [ -f "auth.log" ]; then
     echo "  📁 Parsing auth.log..."
     grep -E "Accepted password|Failed password|Invalid user|POSSIBLE BREAK-IN|useradd|sudo" auth.log | \
-    awk '{
+    awk -v year="$AUTH_LOG_YEAR" '{
+
         month=$1; day=$2; time=$3
         m["Jan"]="01"; m["Feb"]="02"; m["Mar"]="03"; m["Apr"]="04"
         m["May"]="05"; m["Jun"]="06"; m["Jul"]="07"; m["Aug"]="08"
         m["Sep"]="09"; m["Oct"]="10"; m["Nov"]="11"; m["Dec"]="12"
-        ts="2016-" m[month] "-" day "T" time "Z"
+	ts=year "-" m[month] "-" day "T" time "Z"
         
         if ($0 ~ /Accepted password/) {
             event="ssh_login_success"
@@ -45,7 +47,7 @@ if [ -f "auth.log" ]; then
             src_ip=$(NF-1)
             detail="Possible break-in attempt"
         }
-        else if ($0 ~ /useradd/) {
+	    else if ($0 ~ /useradd\[.*new user/) {
             event="user_created"
             for(i=1;i<=NF;i++){if($i=="name="){user=substr($(i+1),1,length($(i+1))-1); break}}
             if(user=="") user=$NF
@@ -63,6 +65,7 @@ if [ -f "auth.log" ]; then
         if (src_ip == "" || src_ip == "from") src_ip = "-"
         if (user == "" || user == "from") user = "-"
         
+	gsub(",", ";", detail)
         printf "%s,Auth,%s,%s,%s,%s\n", ts, event, user, src_ip, detail
     }' >> timeline.csv
 fi
@@ -73,7 +76,7 @@ if [ -f "edr_events.json" ] && command -v jq &> /dev/null; then
     jq -r '
         [.timestamp, "EDR", .event, .user, .src_ip // "-", .detail // "-"] | 
         @csv
-    ' edr_events.json >> timeline.csv 2>/dev/null
+    ' edr_events.json >> timeline.csv || echo "⚠️  jq failed to parse edr_events.json — check its format" >&2
 fi
 
 # ---------- WEB LOGS ----------
