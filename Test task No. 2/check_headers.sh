@@ -40,8 +40,8 @@ for domain in "${DOMAINS[@]}"; do
     i=$((i + 1))
     echo -e "${GREEN}[$i/$TOTAL] $domain ...${NC}"
 
-    # ЗАМЕНА: используем HEAD-запрос (-I) + -k + --noproxy '*'
-    headers=$(curl -sIL -k --noproxy '*' --connect-timeout 15 "https://$domain" 2>/dev/null)
+    # HEAD-запрос (-I), следуем редиректам (-L), таймауты на соединение и на весь запрос
+    headers=$(curl -sIL --noproxy '*' --connect-timeout 15 --max-time 30 "https://$domain" 2>/dev/null)
 
     if [ -z "$headers" ]; then
         echo "$domain,ERROR,ERROR,ERROR,ERROR,ERROR,ERROR" >> "$OUTPUT_FILE"
