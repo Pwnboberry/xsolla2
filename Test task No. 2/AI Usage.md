@@ -45,9 +45,23 @@ The Bash script and the README were developed together with AI (Claude). Below i
 
 AI suggested a much more complex Bash implementation with additional logic (detailed `curl` error handling, temporary files, and complicated redirect parsing). For this assignment, such an implementation was unnecessary. The script was eventually simplified into a cleaner and more practical version.
 
-### 4. Incorrect diagnosis of the network issue
+### 4. Documentation and code went out of sync
 
-When almost every domain (except one) started failing with timeouts, AI immediately assumed the problem was caused by **DPI blocking based on SNI**. Although this sounded reasonable, it turned out not to be the actual cause. AI presented this hypothesis before fully verifying it.
+When reviewing the finished script together with Claude, I described removing the `-k` flag from `curl` in `report.md` (explaining why disabling TLS certificate validation was a bad idea for a security tool), 
+but the actual fix was never applied to `check_headers.sh` - the `-k` flag was still there
+
+Claude caught this by checking the real script file line by line against what the report claimed, instead of trusting the report's description.
+
+The reason for the mismatch was simple: I fixed the code on my local machine, but forgot to push the changes to the remote GitHub repository. 
+
+As a result, the documentation was up to date, but the code in the repository was not.
+
+This case also showed that AI (Claude) is good at catching small inconsistencies that can arise from human oversight. It doesn't fix mistakes for me, but it helps me notice them when I might have otherwise missed them.
+
+**How I fixed it:** removed `-k` from the `curl` call and added `--max-time 30` as an additional safeguard against slow responses that `--connect-timeout` alone doesn't cover, then re-ran the script to confirm the results still
+matched expectations.
+
+This was a good reminder that a written explanation of a fix and the actual ode doing that fix can silently drift apart - I need to verify the file itself, not just re-read my own description of it.
 
 ---
 
