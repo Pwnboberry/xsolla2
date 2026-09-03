@@ -167,6 +167,13 @@ For example, AI sometimes extracted an IP address incorrectly or proposed a solu
 
 Every important step had to be verified manually before being included in the final solution.
 
+
+### 4. A subtle CSV formatting mismatch
+
+While reviewing the generated HTML report against the raw log data, I noticed that all 69 EDR events showed as `EDR: 0` in the report's statistics and had truncated timestamps. Claude traced this to jq's `@csv` output wrapping every field in quotes, while the rest of the script wrote plain unquoted CSV - the two formats silently mismatched when the HTML generator split rows by comma.
+
+Fixed by switching jq's output from `@csv` to `join(",")`, matching the unquoted format used elsewhere in the script.
+
 ---
 
 # Final Note
