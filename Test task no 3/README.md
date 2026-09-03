@@ -60,7 +60,7 @@ python3 cve_monitor.py --dry-run   # test run, no Telegram message sent
 python3 cve_monitor.py             # real run, sends to Telegram
 ```
 
-To run it automatically every day (not set up in this test, but this is how you'd do it with cron):
+To run it automatically every day (this is how it was actually configured for testing — see report.md for a week of real automated runs):
 ```
 0 7 * * * cd /path/to/cve-monitor && /path/to/venv/bin/python3 cve_monitor.py >> cron.log 2>&1
 ```
